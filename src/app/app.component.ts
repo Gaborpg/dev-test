@@ -62,25 +62,9 @@ export class AppComponent implements OnInit, OnDestroy {
     );
 
     combineLatest([
-      this.searchInput$.pipe(
-        startWith(this.filter.input),
-        debounceTime(400),
-        distinctUntilChanged(),
-        filter((search: string) => search.length >= 3 || search.length === 0),
-        switchMap((input: string) => {
-          this.filter.input = input;
-          if (this.cache.getMemory(input) !== null) {
-            return this.cache.getMemory(input);
-          }
-          return this.productsService.getProducts();
-        }),
-        map((products: IProducts[]) => products.filter(productsInputFilter(this.filter.input))),
-        tap((products: IProducts[]) => this.cache.setMemory(this.filter.input, of(products)))
-      ),
-      this.searchStock$.pipe(startWith(this.filter.radio), tap(value => this.filter.radio = value)),
-      this.searchBrand$.pipe(startWith(this.filter.select), tap(value => this.filter.select = value)
-      ),
-
+      this.searchInput(),
+      this.searchStock(),
+      this.searchBrand()
     ]).pipe(
       map(([products]) => products.filter(productsFilter(this.filter))),
       takeUntil(this.destroy$)
@@ -91,6 +75,32 @@ export class AppComponent implements OnInit, OnDestroy {
       err => throwError(err)
     );
 
+  }
+
+  searchInput(): Observable<IProducts[]> {
+    return this.searchInput$.pipe(
+      startWith(this.filter.input),
+      debounceTime(400),
+      distinctUntilChanged(),
+      filter((search: string) => search.length >= 3 || search.length === 0),
+      switchMap((input: string) => {
+        this.filter.input = input;
+        if (this.cache.getMemory(input) !== null) {
+          return this.cache.getMemory(input);
+        }
+        return this.productsService.getProducts();
+      }),
+      map((products: IProducts[]) => products.filter(productsInputFilter(this.filter.input))),
+      tap((products: IProducts[]) => this.cache.setMemory(this.filter.input, of(products)))
+    )
+  }
+
+  searchStock(): Observable<string> {
+    return this.searchStock$.pipe(startWith(this.filter.radio), tap(value => this.filter.radio = value));
+  }
+
+  searchBrand(): Observable<string> {
+    return this.searchBrand$.pipe(startWith(this.filter.select), tap(value => this.filter.select = value));
   }
 
   ngOnDestroy(): void {
