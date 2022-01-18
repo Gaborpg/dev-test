@@ -1,4 +1,5 @@
-import { Component } from "@angular/core";
+import { Component, Input } from "@angular/core";
+import { IProducts } from "./products.service";
 
 @Component({
   selector: "products-table",
@@ -7,5 +8,6 @@ import { Component } from "@angular/core";
   providers: []
 })
 export class ProductsGridComponent {
+  @Input() products: IProducts[];
 
 }

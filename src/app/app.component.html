@@ -109,28 +109,36 @@
   <img src="/assets/logo_white.png" />
 </div>
 
-<div class="content" role="main">
+<div class="content" role="main" *ngIf="products$ | async">
   <h2>Products</h2>
   <div class="container">
     <div class="filter">
       <label for="search">Search</label>
-      <input id="search" />
+      <input id="search" [(ngModel)]="filter.input" (input)="searchInput$.next($event.target.value)" />
     </div>
     <div class="filter">
       <label for="brands">Brands</label>
-      <select id="brands"> </select>
+      <select id="brands" [(ngModel)]="filter.select" (change)="searchBrand$.next($event.target.value)">
+        <option value="all" selected>All</option>
+        <option [value]="brand" *ngFor="let brand of brands">{{brand}}</option>
+      </select>
     </div>
     <div class="filter">
-      <label for="in-stock">All</label>
-      <input type="radio" id="in-stock" name="stock" value="all" checked>
-      <label for="in-stock">In stock</label>
-      <input type="radio" id="in-stock" name="stock" value="in-stock">
-      <label for="out-of-stock">Out of stock</label>
-      <input type="radio" id="out-of-stock" name="stock" value="out-of-stock">
+      <label for="all">All
+        <input type="radio" id="all" name="stock-all" value="all" [(ngModel)]="filter.radio"
+          (input)="searchStock$.next($event.target.value)">
+      </label>
+      <label for="in-stock">In stock
+        <input type="radio" id="in-stock" name="stock-in" value="in-stock" [(ngModel)]="filter.radio"
+          (input)="searchStock$.next($event.target.value)">
+      </label>
+      <label for="out-of-stock">Out of stock
+        <input type="radio" id="out-of-stock" name="stock-out" value="out-of-stock" [(ngModel)]="filter.radio"
+          (input)="searchStock$.next($event.target.value)">
+      </label>
+    </div>
+    <div class="container">
+      <products-table [products]="products">
+      </products-table>
     </div>
   </div>
-  <div class="container">
-    <products-table>
-    </products-table>
-  </div>
-</div>

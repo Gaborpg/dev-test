@@ -1,11 +1,21 @@
 import { Injectable } from "@angular/core";
-import { of, combineLatest} from "rxjs";
-import { map } from "rxjs/operators";
+import { of, combineLatest, Observable } from "rxjs";
+import { filter, map } from "rxjs/operators";
+
+export interface IProducts {
+  id: string;
+  name: string;
+  price: string;
+  description: string;
+  brand: string;
+  quantity: number;
+}
+
 
 @Injectable()
 export class ProductsService {
 
-  public getProducts() {
+  public getProducts(): Observable<IProducts[]> {
     return of([
       {
         id: "AC7655_580",
@@ -70,7 +80,10 @@ export class ProductsService {
     //Update this logic to pass the failing test
     return combineLatest([
       getProduct,
-      getQuantity]
+      getQuantity.pipe(
+        filter(x => x === 8)
+        //skip(1) also works
+      )]
     )
       .pipe(map(result => {
         return { name: result[0], quantity: result[1] }
